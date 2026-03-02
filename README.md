@@ -47,15 +47,3 @@ npm run generate:config
 ### 3) 실행
 정적 파일 프로젝트이므로 브라우저에서 `index.html`을 열면 됩니다.
 
-## 스크립트
-- `npm run generate:config`: `.env` → `js/config.js` 생성
-
-## 주의
-- `js/config.js`는 자동 생성 파일이며 커밋하지 않습니다.
-- `.env`에는 실제 Firebase 키가 들어갑니다. 외부 공유 금지.
-
-## 주요 파일
-- `index.html`
-- `js/firebase.js`
-- `js/config.js` (생성 파일)
-- `scripts/generate-config.js`
