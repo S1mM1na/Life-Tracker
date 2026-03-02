@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "generate:config": "node scripts/generate-config.js"
+  },
   "dependencies": {
     "firebase": "^10.12.2"
   }

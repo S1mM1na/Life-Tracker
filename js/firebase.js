@@ -2,16 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, updatePassword, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, set, get} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { v4 as uuidv4 } from "https://cdn.jsdelivr.net/npm/uuid@9.0.0/dist/esm-browser/index.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyBMwHPB2y4xe5X4RATspyh-vdeQDxP3_co",
-    authDomain: "life-tracker-1d8ad.firebaseapp.com",
-    databaseURL: "https://life-tracker-1d8ad-default-rtdb.firebaseio.com",
-    projectId: "life-tracker-1d8ad",
-    storageBucket: "life-tracker-1d8ad.appspot.com",
-    messagingSenderId: "849733791983",
-    appId: "1:849733791983:web:75ac483e5f011e9a21eb1a"
-};
+import { firebaseConfig } from "./config.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
