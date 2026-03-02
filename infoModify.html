@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin: 0 auto;
+            max-width: 500px;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .form-group p {
+            width: 200px;
+            margin: 0;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .form-group input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.05);
+            border-radius: 7px;
+            height: 30px;
+            margin-left: 20px;
+        }
+
+        .signup-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        #modify-button, #back-button {
+            flex-direction: row;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #cacaca;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #modify-button:hover {
+            background-color: black;
+        }
+
+        .bottom {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Life Tracker</h1>
+    <ul>
+        <li><a href="scheduler.html">Scheduler</a></li>
+        <li class="dropdown">
+            <a href="timer.html">Timer</a>
+            <div class="dropdown-content">
+                <a href="stopwatch.html">Stopwatch</a>
+            </div>
+        </li>
+        <li><a href="song.html">Song</a></li>
+        <li><a href="diary.html">Diary</a></li>
+        <li><a href="myPage.html" id="selected-list">My page</a></li>
+    </ul>
+    <h2>회원정보</h2>
+    <br><br><br>
+    <form class="form-container">
+        <div class="form-group">
+            <p>이름:</p>
+            <input type="text" id="name" placeholder="name">
+        </div> <br>
+        <div class="form-group">
+            <p>이메일:</p>
+            <input type="text" id="account" placeholder="E-mail" readonly>
+        </div>
+        <div class="form-group">
+            <p>새 비밀번호:</p>
+            <input type="password" id="pw" placeholder="password">
+        </div>
+        <div class="form-group">
+            <p>새 비밀번호 확인:</p>
+            <input type="password" id="pwRE" placeholder="password check">
+        </div> <br>
+        <div class="form-group">
+            <p>생년월일:</p>
+            <input type="date" id="birthday" placeholder="birthday">
+        </div>
+        <div class="form-group">
+            <p>전화번호:</p>
+            <input type="text" id="ph_num" placeholder="phone">
+        </div>
+        <br><br><br><br><br>
+        <div class="bottom">
+            <input type="button" value="Submit" id="modify-button">
+            <button type="button" id="back-button">Back</button>    
+        </div>
+    </form>
+
+    <script type="module">
+        import { auth, db, ref, set, get, getUserInfo } from './js/firebase.js';     
+
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const userInfo = await getUserInfo(user.uid);
+
+                    if (userInfo) {
+                        document.getElementById('name').value = userInfo.name;
+                        document.getElementById('account').value = userInfo.email;
+                        document.getElementById('birthday').value = userInfo.birthday;
+                        document.getElementById('ph_num').value = userInfo.phone;
+                    }
+                } catch (error) {
+                    console.error('사용자 정보를 가져오는 중 에러 발생:', error);
+                }
+            } else {
+                console.log('사용자가 로그인하지 않았습니다.');
+            }
+        });        
+    </script>
+    <script type="module" src="js/infomodify.js"></script>
+</body>
+</html>

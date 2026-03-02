@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css" />
+    <title>Life Tracker - Signup</title>
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            background: white;
+            justify-content: center; /* 중앙정렬 */
+            align-items: center; /* 중앙정렬 */
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .signup-container {
+            display: flex;
+            justify-content: right;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        #title {
+            font-size: 70px;
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="date"] {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 27px;
+            border-radius: 7px;
+            width: 400px;
+            box-sizing: border-box;
+            font-size: 21px;
+        }
+
+        input[type="button"] {
+            background-color: white;
+            color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 13px 26px;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            width: 160px;
+            margin: 6px;
+        }
+
+        input[type="button"]:hover {
+            background-color: #333;
+            color: white;
+        }
+    </style>
+
+    <script>
+        function pwCHECK(pw, pwRE) {
+            if (pw !== pwRE) {
+                alert('비밀번호가 알맞지 않습니다.');
+                return false;
+            }
+            return true;
+        }
+
+        function nullCHECK(inputs) {
+            for (let input of inputs) {
+                if (input.value.trim() === '') {
+                    alert('모든 정보를 입력해주세요.');
+                    return false;
+                }
+            }
+            return true;
+        }
+    </script>
+</head>
+
+<body>
+    <div class="signup-info">
+        <div>
+            <h1 id="title">회원 가입</h1>
+            <p style="color:grey">Life Tracker에 오신 것을 환영합니다 ^___^</p>
+            <br><br>
+            <form class="form-container">
+                <label for="name"></label>
+                <input type="text" id="name" placeholder="name">
+                <p></p>
+                <label for="account"></label>
+                <input type="text" id="account" placeholder="E-mail">
+                <label for="pw"></label>
+                <input type="password" id="pw" placeholder="password">
+                <label for="pwRE"></label>
+                <input type="password" id="pwRE" placeholder="password check">
+                <p></p>
+                
+                <label for="birthday"></label>
+                <input type="date" id="birthday" placeholder="birthday">
+                <label for="ph_num"></label>
+                <input type="text" id="ph_num" placeholder="phone">
+
+                <div class="signup-container">
+                    <input type="button" value="Finish" id="signup-button">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/signup.js" type="module"></script>
+</body>
+
+</html>

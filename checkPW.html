@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css" />
+    <title>Life Tracker - Mypage</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: white;
+        }
+
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .form-group input {
+            margin-right: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #confirm {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #cacaca;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #confirm:hover {
+            background-color: black;
+        }
+            #back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #cacaca;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #back-button:hover {
+            background-color: black;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <h1>Life Tracker</h1>
+    <ul>
+        <li><a href="scheduler.html">Scheduler</a></li>
+        <li class="dropdown">
+            <a href="timer.html">Timer</a>
+            <div class="dropdown-content">
+                <a href="stopwatch.html">Stopwatch</a>
+            </div>
+        </li>
+        <li><a href="song.html">Song</a></li>
+        <li><a href="diary.html">Diary</a></li>
+        <li><a href="myPage.html" id="selected-list">My page</a></li>
+    </ul>
+    <div class="form-group">
+        <h2>비밀번호를 입력해주세요</h2>
+    </div>
+    <div class="form-group">
+        <input type="password" id="pwRE" placeholder="password check">
+        <button id="confirm">확인</button>
+    </div>
+
+
+    <script type="module">
+        import { auth, db, ref, set, get, getUserInfo } from './js/firebase.js';     
+
+        let correctPassword;
+
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const userInfo = await getUserInfo(user.uid);
+
+                    if (userInfo) {
+                        const userName = userInfo.name;
+                        const userUid = userInfo.uid;
+                        let path = `users/${userUid}`;
+                        const userSnapshot = await get(ref(db, path));
+                        const uservalue = userSnapshot.val();
+
+                        correctPassword = uservalue.password;
+                        console.log(correctPassword);
+                    } else {
+                    console.error('사용자 정보가 없습니다.');
+                    }
+                } catch (error) {
+                    console.error('사용자 정보를 가져오는 중 에러 발생:', error);
+                }
+            } else {
+                console.log('사용자가 로그인하지 않았습니다.');
+            }
+        });
+
+        document.getElementById('confirm').addEventListener('click', () => {
+            const enteredPassword = document.getElementById('pwRE').value;
+            if (enteredPassword === correctPassword) {
+                window.location.href = 'infoModify.html';
+            } else {
+                alert('비밀번호가 틀렸습니다.');
+            }
+        });
+
+    </script>
+        <button type="button" id="back-button">Back</button>
+
+        <script>
+            document.getElementById('back-button').addEventListener('click', () => {
+                window.location.href = 'myPage.html';
+            });
+            
+        </script>
+</body>
+
+</html>

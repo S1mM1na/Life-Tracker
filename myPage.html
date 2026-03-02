@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css" />
+    <title>Life Tracker - Mypage</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .charts {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 50px;
+        }
+
+        .chart-container {
+            width: 45%;
+        }
+
+        #logout, #modify {
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #cacaca;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+
+        #logout:hover {
+            background-color: black;
+        }
+
+        #modify:hover {
+            background-color: black;
+        }
+
+        .bottom {
+            bottom: 20px;
+            margin-right: 380px;
+            display: flex;
+            flex-direction: column; /* 수직 정렬 */
+            gap: 10px; /* 버튼 사이의 간격 조절 */
+        }
+        footer {
+        margin-top: 50px;
+        padding: 20px;
+        background-color: #333;
+        color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Life Tracker</h1>
+    <ul>
+        <li><a href="scheduler.html">Scheduler</a></li>
+        <li class="dropdown">
+            <a href="timer.html">Timer</a>
+            <div class="dropdown-content">
+                <a href="stopwatch.html">Stopwatch</a>
+            </div>
+        </li>
+        <li><a href="song.html" >Song</a></li>
+        <li><a href="diary.html">Diary</a></li>
+        <li><a href="myPage.html"id="selected-list">My page</a></li>
+    </ul>
+
+    <div class="container">
+        <h1 id="user-greeting">사용자 이름 불러오는 중...</h1>
+        <h2 id="completed-tasks">목표 정보 불러오는 중...</h2>
+
+        <div class="charts">
+            <div class="chart-container">
+                <canvas id="weeklyChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br> 
+
+    <div class="bottom">
+        <button id="modify">modify</button>
+        <button id="logout">Log out</button>
+    </div>
+    <footer>
+        <p >&copy; 2024 Life Tracker</p>
+    </footer>
+    <script type="module">
+        import { auth, db, ref, set, get, getUserInfo } from './js/firebase.js';     
+
+        const currentDate = new Date();
+        const currentDayOfWeek = currentDate.getDay();
+        const currentMonth = currentDate.getMonth();
+        const currentDay = currentDate.getDate();  
+        
+        let year = currentDate.getFullYear();
+        let month = ('0' + (currentMonth + 1)).slice(-2);
+        let day = ('0' + currentDay).slice(-2);
+        let dateKey = `${year}${month}${day}`;
+
+        async function fetchWeeklyData(userUid) {
+        const weeklyData = [];
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(currentDate);
+            date.setDate(date.getDate() - (currentDayOfWeek - i));
+            const year = date.getFullYear();
+            const month = ('0' + (date.getMonth() + 1)).slice(-2);
+            const day = ('0' + date.getDate()).slice(-2);
+            const dateKey = `${year}${month}${day}`;
+
+            const completionRatePath = `statistics/${userUid}/${dateKey}/rate`;
+            const completionnumPath = `statistics/${userUid}/${dateKey}/number`;
+
+            const completionRateSnapshot = await get(ref(db, completionRatePath));
+            const completionnumSnapshot = await get(ref(db, completionnumPath));
+
+            const completionRate = completionRateSnapshot.val() || 0;
+            const completionNum = completionnumSnapshot.val() || 0;
+
+            weeklyData.push(completionRate * 100);
+        }
+        return weeklyData;
+    }
+
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const userInfo = await getUserInfo(user.uid);
+
+                    if (userInfo) {
+                        const userName = userInfo.name;
+                        const userUid = userInfo.uid;
+                        let path = `scheduler/${userUid}/${dateKey}/todoList/totalNum`;
+                        const totalTasksSnapshot = await get(ref(db, path));
+                        const totalTasks = totalTasksSnapshot.val();
+                        path = `scheduler/${userUid}/${dateKey}/todoList/selectedNum`;
+                        const completedTasksSnapshot = await get(ref(db, path));
+                        const completedTasks = completedTasksSnapshot.val();
+
+                        if(totalTasks != null){
+                            if(completedTasks != null){
+                                if(completedTasks / totalTasks == 1){
+                                    document.getElementById('user-greeting').textContent = `${userName}님 완벽해요!`;
+                                } else if (completedTasks / totalTasks > 0.66) {
+                                    document.getElementById('user-greeting').textContent = `${userName}님 잘하고 있어요!`;
+                                } else if (completedTasks / totalTasks > 0.33) {
+                                    document.getElementById('user-greeting').textContent = `${userName}님 조금 더 힘내볼까요?`;
+                                }
+                                else{
+                                    document.getElementById('user-greeting').textContent = `${userName}님 조금 더 분발하세요!`;
+                                }
+                            } else {
+                                completedTasks = 0;
+                            }
+                            document.getElementById('completed-tasks').textContent = `오늘 완료한 목표 수 ${completedTasks} / ${totalTasks}`;
+                        } else{
+                            document.getElementById('user-greeting').textContent = `${userName}님 안녕하세요!`;
+                            document.getElementById('completed-tasks').textContent = `목표 정보를 불러올 수 없습니다.`;
+                        }
+
+                        const weeklyData = await fetchWeeklyData(userUid);
+
+                        const weeklyChartCtx = document.getElementById('weeklyChart').getContext('2d');
+                        const weeklyColors = Array(7).fill('rgba(0, 0, 0, 100)');
+                        weeklyColors[currentDayOfWeek] = 'rgba(0, 0, 0, 0)'; 
+
+                        new Chart(weeklyChartCtx, {
+                            type: 'line',
+                            data: {
+                                labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                                datasets: [{
+                                    label: 'Tasks Completed',
+                                    data: weeklyData,
+                                    borderColor: 'black',
+                                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                                    fill: false
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    x: {
+                                        beginAtZero: true
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 100, // y축 최대값을 100으로 설정
+                                        ticks: {
+                                            callback: function(value) {
+                                                return value + '%'; // y축 레이블에 % 추가
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        console.error('사용자 정보가 없습니다.');
+                    }
+                } catch (error) {
+                    console.error('사용자 정보를 가져오는 중 에러 발생:', error);
+                }
+            } else {
+                console.log('사용자가 로그인하지 않았습니다.');
+            }
+        });
+
+        const monthlyChartCtx = document.getElementById('monthlyChart').getContext('2d');
+        const monthlyData = [32, 25, 15, 27, 38, 29, 0, 0, 0, 0, 0, 0];
+        const monthlyColors = Array(12).fill('rgba(0, 0, 0, 0.4)');
+        monthlyColors[currentMonth] = 'rgba(0, 0, 0, 10)'; 
+
+        new Chart(monthlyChartCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: monthlyData,
+                    backgroundColor: monthlyColors,
+                    borderColor: monthlyColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 50
+                    }
+                }
+            }
+        });
+
+        document.getElementById('logout').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+        document.getElementById('modify').addEventListener('click', () => {
+            window.location.href = 'checkPW.html';
+        });
+    </script>
+
+    <script type="module" src="js/logout.js"></script>   
+</body>
+
+</html>
